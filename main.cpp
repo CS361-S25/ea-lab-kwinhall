@@ -1,38 +1,50 @@
 #include <iostream>
 #include "Empirical/include/emp/math/Random.hpp"
 
-int main() {
-    class Organism {
-      public:
+class Organism {
+    public:
         double behavior;
-        Organism(double x) {
+        Organism(double x=0) {
             behavior = x;
         }
-        Organism reproduce() {
-            return *new Organism(behavior);
+        void mutate(emp::Random random) {
+            double randomNum = random.GetRandNormal(0.0, 0.02);
+            behavior += randomNum;
         }
-    };   
+        Organism* reproduce(emp::Random random) {
+            Organism* child = new Organism(behavior);
+            child->mutate(random);
+            return child;
+        }
+    };
 
+int main() {
+    emp::Random random(1);
     emp::vector<Organism> population;
+
+    // create population and mutate initial organisms
     for (int i = 0; i < 100; i++) {
         population.push_back(*new Organism(0.5));
-    }
-    std::cout << population[4].behavior << std::endl;
-
-    Organism parent = *new Organism(1);
-    Organism child = parent.reproduce();
-    std::cout << child.behavior << std::endl;
-
-    for (int update = 0; update < 100; update++) {
-        
+        population[i].mutate(random);
     }
 
-    Organism bestOrganism = population[0];
-    for(Organism j : population) {
-        if (j.behavior > bestOrganism.behavior) {
-            bestOrganism = j;
+    int numUpdates = 10000;
+    for (int update = 0; update < numUpdates; update++) { 
+        // find organism with max behavior value
+        Organism& bestOrganism = population[0];
+        for(Organism j : population) {
+            if (j.behavior > bestOrganism.behavior) {
+                bestOrganism = j;
+            }
+        }
+
+        // replace a random organism in the population with the best organism's child
+        Organism* newOrganism = bestOrganism.reproduce(random);
+        int overwrite = random.GetUInt(0,100);
+        population[overwrite] = *newOrganism;
+
+        if (update == numUpdates - 1) {
+            std::cout << bestOrganism.behavior << std::endl;
         }
     }
-    
-    Organism newOrganism = bestOrganism.reproduce();
 }
