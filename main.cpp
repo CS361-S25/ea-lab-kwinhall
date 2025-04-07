@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Empirical/include/emp/math/Random.hpp"
+// By Kendra Winhall 
 
 class Organism {
     public:
@@ -33,7 +34,7 @@ int main() {
         // find organism with max behavior value
         Organism& bestOrganism = population[0];
         for(Organism j : population) {
-            if (j.behavior > bestOrganism.behavior) {
+            if (abs(M_PI - j.behavior) < abs(M_PI - bestOrganism.behavior)) {
                 bestOrganism = j;
             }
         }
